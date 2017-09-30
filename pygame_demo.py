@@ -7,6 +7,9 @@ from pygame.mixer import Sound
 
 SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
 
+# draw rectangles
+# https://www.cs.ucsb.edu/~pconrad/cs5nm/topics/pygame/drawing/
+
 
 def init_pygame():
     pygame.mixer.pre_init(44100, -16, 2, 512)  # smaller buffer
@@ -15,6 +18,9 @@ def init_pygame():
     pygame.mixer.set_num_channels(32)
     pygame.init()
     pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    return screen
+
 
 
 def get_mappings():
@@ -46,10 +52,20 @@ def verify_sounds_and_mappings(sounds, mappings):
         assert name in sounds, '{} (key {}) not in sounds'.format(name, key)
 
     
-init_pygame()
+screen = init_pygame()
 sounds, mappings = get_mappings()
 verify_sounds_and_mappings(sounds, mappings)
+sounds_idx = {name: idx for idx, name in enumerate(sounds)}
 
+music_events = []
+FLIGHT_TIME = 5.  # seconds
+FPS = 30.
+REFRESH_TIME = 1. / FPS
+TOLERANCE = 1.5
+BLOCK_WIDTH = SCREEN_WIDTH / max(1, len(sounds))
+BLOCK_HEIGHT = SCREEN_HEIGHT / 30
+
+last_refresh = None
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -61,9 +77,40 @@ while True:
                 sound = sounds[name]
                 print 'Playing', name
                 sound.play()
+                music_events.append({
+                    'time': time.time(),
+                    'name': name
+                })
+
+                print music_events
             elif event.key == pygame.K_SPACE:
                 pygame.mixer.stop()
                 print 'Clear sounds'
             else:
                 print 'Unrecognized key {}'.format(event.key)
                 continue
+    # pretty print
+    now = time.time()
+    if last_refresh is None or now - last_refresh > REFRESH_TIME:
+        print 'redraw'        
+        screen.fill((0,0,0))  # clear screen
+        last_refresh = now
+        pygame.display.update()
+        # remove all events older than FLIGHT_TIME*TOLERANCE
+        idx = 0
+        for idx, m_event in enumerate(music_events):
+            if now - m_event['time'] <= TOLERANCE * FLIGHT_TIME:
+                break
+        music_events = music_events[idx:]
+        # draw events
+        for m_event in music_events:
+            # x position is instrument
+            name = m_event['name']
+            x = sounds_idx[name] * BLOCK_WIDTH
+            # y position proportional to time elapsed
+            dt = now-m_event['time']
+            y = int(dt * SCREEN_HEIGHT / float(FLIGHT_TIME))
+            # draw rectangle
+            pygame.draw.rect(screen, (255, 0, 255), (x, y, BLOCK_WIDTH, BLOCK_HEIGHT), 0)
+        # update
+        pygame.display.update()
