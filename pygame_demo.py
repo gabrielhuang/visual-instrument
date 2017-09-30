@@ -5,13 +5,16 @@ import time
 import pygame
 from pygame.mixer import Sound
 
+SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
+
+
 def init_pygame():
     pygame.mixer.pre_init(44100, -16, 2, 512)  # smaller buffer
     #pygame.mixer.pre_init(44100, -16, 2, 2048)
     pygame.mixer.init()
     pygame.mixer.set_num_channels(32)
     pygame.init()
-    pygame.display.set_mode()
+    pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
 
 
 def get_mappings():
@@ -22,11 +25,13 @@ def get_mappings():
        'guitar_e': Sound('samples/130625_130657-[2].wav'),
        'guitar_am': Sound('samples/130625_131130-[6].wav'),
        'guitar_c7': Sound('samples/130625_131722-[4].wav'),
-       'guitar_d': Sound('samples/130625_132027-[5].wav')
+       'guitar_d': Sound('samples/130625_132027-[5].wav'),
+       'hat': Sound('samples/Hat 6.wav')
     }
     mappings = {
         pygame.K_k: 'kick',
         pygame.K_s: 'snare',
+        pygame.K_a: 'hat',
         pygame.K_d: 'drumloop',
         pygame.K_1: 'guitar_e',
         pygame.K_2: 'guitar_am',
