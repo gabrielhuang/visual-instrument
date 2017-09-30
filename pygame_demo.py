@@ -17,12 +17,12 @@ def init_pygame():
 def get_mappings():
     sounds = {
        'kick':  Sound("samples/Bass-Drum-1.wav"),
-       'snare':  Sound("samples/673-samples/Snares/Snare 16.wav"),
+       'snare':  Sound("samples/Snare 16.wav"),
        'drumloop':  Sound("samples/drum-loop-paper-bird-ricardo-espino.wav"),
-       'guitar_e': Sound('samples/epic_guitar_chords_andrew_chellman/130624_101835-[8].wav'),
-       'guitar_am': Sound('samples/epic_guitar_chords_andrew_chellman/130625_131130-[6].wav'),
-       'guitar_c7': Sound('samples/epic_guitar_chords_andrew_chellman/130625_131722-[4].wav'),
-       'guitar_d': Sound('samples/epic_guitar_chords_andrew_chellman/130625_132027-[5].wav')
+       'guitar_e': Sound('samples/130625_130657-[2].wav'),
+       'guitar_am': Sound('samples/130625_131130-[6].wav'),
+       'guitar_c7': Sound('samples/130625_131722-[4].wav'),
+       'guitar_d': Sound('samples/130625_132027-[5].wav')
     }
     mappings = {
         pygame.K_k: 'kick',
