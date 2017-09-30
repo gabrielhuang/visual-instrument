@@ -47,6 +47,28 @@ def get_mappings():
     }
     return sounds, mappings
 
+def get_mappings_house():
+    sounds = {
+       'kick':  Sound("samples/Bass-Drum-1.wav"),
+       'snare':  Sound("samples/Snare 16.wav"),
+       'drumloop_1':  Sound("samples/House_Kit_01-Full_Drums-125-E.wav"),
+       'drumloop_2':  Sound("samples/House_Kit_01-Kickless_Drums-125-E.wav"),
+       'bass_e': Sound('samples/Bass E.wav'),
+       'bass_f': Sound('samples/Bass F.wav'),
+       'hat': Sound('samples/Hat 6.wav')
+    }
+    mappings = {
+        pygame.K_k: 'kick',
+        pygame.K_s: 'snare',
+        pygame.K_a: 'hat',
+        pygame.K_d: 'drumloop_1',
+        pygame.K_f: 'drumloop_2',
+        pygame.K_1: 'bass_e',
+        pygame.K_2: 'bass_f',
+    }
+    return sounds, mappings
+
+
 
 def verify_sounds_and_mappings(sounds, mappings):
     for key, name in mappings.items():
@@ -64,7 +86,8 @@ def float_to_rgb(x, darken=1.):
 
     
 screen = init_pygame()
-sounds, mappings = get_mappings()
+#sounds, mappings = get_mappings()
+sounds, mappings = get_mappings_house()
 verify_sounds_and_mappings(sounds, mappings)
 sounds_idx = {name: idx for idx, name in enumerate(sounds)}
 sounds_colors = {name: float_to_rgb(float(idx)/len(sounds_idx)) for name, idx in sounds_idx.items()}
