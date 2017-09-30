@@ -77,9 +77,13 @@ TOLERANCE = 1.5
 BLOCK_WIDTH = SCREEN_WIDTH / max(1, len(sounds))
 BLOCK_HEIGHT = SCREEN_HEIGHT / 50
 CURRENT_KEY_LAG = 0.3
+TIGHTEST_SLEEP = 0.001
 
 last_refresh = None
 while True:
+    # afford tiny sleep
+    time.sleep(TIGHTEST_SLEEP)    
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit(); #sys.exit() if sys is imported
