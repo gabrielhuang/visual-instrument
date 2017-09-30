@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import pygame
 from pygame.mixer import Sound
 
-SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
+SCREEN_WIDTH, SCREEN_HEIGHT = 800, 900
 
 # draw rectangles
 # https://www.cs.ucsb.edu/~pconrad/cs5nm/topics/pygame/drawing/
@@ -75,7 +75,8 @@ FPS = 30.
 REFRESH_TIME = 1. / FPS
 TOLERANCE = 1.5
 BLOCK_WIDTH = SCREEN_WIDTH / max(1, len(sounds))
-BLOCK_HEIGHT = SCREEN_HEIGHT / 30
+BLOCK_HEIGHT = SCREEN_HEIGHT / 50
+CURRENT_KEY_LAG = 0.3
 
 last_refresh = None
 while True:
@@ -97,6 +98,7 @@ while True:
                 #print music_events
             elif event.key == pygame.K_SPACE:
                 pygame.mixer.stop()
+                music_events = []  # clear music events
                 print 'Clear sounds'
             else:
                 print 'Unrecognized key {}'.format(event.key)
@@ -125,7 +127,10 @@ while True:
             color_indicator = sounds_idx[name] / float(len(sounds_idx))
             dt_indicator = np.clip((1-dt/FLIGHT_TIME)**2., 0, 1)
             color = float_to_rgb(sounds_idx[name] / float(len(sounds_idx)), dt_indicator)
-            # draw rectangle
+            # draw falling rectangle
             pygame.draw.rect(screen, color, (x, y, BLOCK_WIDTH, BLOCK_HEIGHT), 0)
+            # also draw current instrument
+            if dt < CURRENT_KEY_LAG:
+                pygame.draw.rect(screen, color, (x, 0, BLOCK_WIDTH, BLOCK_HEIGHT), 0)
         # update
         pygame.display.update()
