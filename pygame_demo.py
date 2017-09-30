@@ -49,12 +49,14 @@ def get_mappings():
 
 def get_mappings_house():
     sounds = {
-       'kick':  Sound("samples/Bass-Drum-1.wav"),
+       'kick':  Sound("samples/house-Kick.wav"),
        'snare':  Sound("samples/Snare 16.wav"),
        'drumloop_1':  Sound("samples/House_Kit_01-Full_Drums-125-E.wav"),
        'drumloop_2':  Sound("samples/House_Kit_01-Kickless_Drums-125-E.wav"),
        'bass_e': Sound('samples/Bass E.wav'),
        'bass_f': Sound('samples/Bass F.wav'),
+       'chord_c': Sound('samples/house-Chord C.wav'),
+       'chord_g': Sound('samples/house-Chord G.wav'),
        'hat': Sound('samples/Hat 6.wav')
     }
     mappings = {
@@ -65,6 +67,8 @@ def get_mappings_house():
         pygame.K_f: 'drumloop_2',
         pygame.K_1: 'bass_e',
         pygame.K_2: 'bass_f',
+        pygame.K_3: 'chord_c',
+        pygame.K_4: 'chord_g',
     }
     return sounds, mappings
 
