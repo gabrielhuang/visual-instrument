@@ -49,15 +49,15 @@ def get_mappings():
 
 def get_mappings_house():
     sounds = {
-       'kick':  Sound("samples/house-Kick.wav"),
-       'snare':  Sound("samples/Snare 16.wav"),
-       'drumloop_1':  Sound("samples/House_Kit_01-Full_Drums-125-E.wav"),
-       'drumloop_2':  Sound("samples/House_Kit_01-Kickless_Drums-125-E.wav"),
-       'bass_e': Sound('samples/Bass E.wav'),
-       'bass_f': Sound('samples/Bass F.wav'),
-       'chord_c': Sound('samples/house-Chord C.wav'),
-       'chord_g': Sound('samples/house-Chord G.wav'),
-       'hat': Sound('samples/Hat 6.wav')
+       'kick':  (Sound("samples/house-Kick.wav"), 0),
+       'snare':  (Sound("samples/Snare 16.wav"), 0),
+       'drumloop_1':  (Sound("samples/House_Kit_01-Full_Drums-125-E.wav"), 1),
+       'drumloop_2':  (Sound("samples/House_Kit_01-Kickless_Drums-125-E.wav"), 1),
+       'bass_e': (Sound('samples/Bass E.wav'), 0),
+       'bass_f': (Sound('samples/Bass F.wav'), 0),
+       'chord_c': (Sound('samples/house-Chord C.wav'), 0),
+       'chord_g': (Sound('samples/house-Chord G.wav'), 0),
+       'hat': (Sound('samples/Hat 6.wav'), 0)
     }
     mappings = {
         pygame.K_k: 'kick',
@@ -118,9 +118,9 @@ while True:
             # Go through mappings
             if event.key in mappings:
                 name = mappings[event.key]
-                sound = sounds[name]
+                sound, loop = sounds[name]
                 print 'Playing', name
-                sound.play()
+                sound.play(loops=-1 if loop else 0)
                 music_events.append({
                     'time': time.time(),
                     'name': name
@@ -142,10 +142,13 @@ while True:
         pygame.display.update()
         # remove all events older than FLIGHT_TIME*TOLERANCE
         idx = 0
+        new_events = []
         for idx, m_event in enumerate(music_events):
-            if now - m_event['time'] <= TOLERANCE * FLIGHT_TIME:
-                break
-        music_events = music_events[idx:]
+            name = m_event['name']
+            loop = sounds[name][1]
+            if now - m_event['time'] <= TOLERANCE * FLIGHT_TIME or loop:
+                new_events.append(m_event)
+        music_events = new_events
         # draw events
         for m_event in music_events:
             # x position is instrument
@@ -156,10 +159,17 @@ while True:
             y = int(dt * SCREEN_HEIGHT / float(FLIGHT_TIME))
             # color
             color_indicator = sounds_idx[name] / float(len(sounds_idx))
-            dt_indicator = np.clip((1-dt/FLIGHT_TIME)**2., 0, 1)
-            color = float_to_rgb(sounds_idx[name] / float(len(sounds_idx)), dt_indicator)
             # draw falling rectangle
-            pygame.draw.rect(screen, color, (x, y, BLOCK_WIDTH, BLOCK_HEIGHT), 0)
+            # if loop just fill whole screen
+            loop = sounds[name][1]
+            if loop:
+                dt_indicator = 0.5+0.25*(1+np.sin(3*now))
+                color = float_to_rgb(sounds_idx[name] / float(len(sounds_idx)), dt_indicator)
+                pygame.draw.rect(screen, color, (x, 0, BLOCK_WIDTH, SCREEN_HEIGHT), 0)
+            else:
+                dt_indicator = np.clip((1-dt/FLIGHT_TIME)**2., 0, 1)
+                color = float_to_rgb(sounds_idx[name] / float(len(sounds_idx)), dt_indicator)
+                pygame.draw.rect(screen, color, (x, y, BLOCK_WIDTH, BLOCK_HEIGHT), 0)
             # also draw current instrument
             if dt < CURRENT_KEY_LAG:
                 pygame.draw.rect(screen, color, (x, 0, BLOCK_WIDTH, BLOCK_HEIGHT), 0)
