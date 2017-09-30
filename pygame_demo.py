@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import time
-
+import numpy as np
+import matplotlib.pyplot as plt
 import pygame
 from pygame.mixer import Sound
 
@@ -51,14 +52,25 @@ def verify_sounds_and_mappings(sounds, mappings):
     for key, name in mappings.items():
         assert name in sounds, '{} (key {}) not in sounds'.format(name, key)
 
+
+def float_to_rgb(x, darken=1.):
+    r,g,b,a = plt.cm.jet(x, bytes=True)
+    if darken != 1.:
+        darken = np.clip(darken, 0, 1)
+        r = int(darken*r)
+        g = int(darken*g)
+        b = int(darken*b)
+    return (r,g,b)
+
     
 screen = init_pygame()
 sounds, mappings = get_mappings()
 verify_sounds_and_mappings(sounds, mappings)
 sounds_idx = {name: idx for idx, name in enumerate(sounds)}
+sounds_colors = {name: float_to_rgb(float(idx)/len(sounds_idx)) for name, idx in sounds_idx.items()}
 
 music_events = []
-FLIGHT_TIME = 5.  # seconds
+FLIGHT_TIME = 3.  # seconds
 FPS = 30.
 REFRESH_TIME = 1. / FPS
 TOLERANCE = 1.5
@@ -82,7 +94,7 @@ while True:
                     'name': name
                 })
 
-                print music_events
+                #print music_events
             elif event.key == pygame.K_SPACE:
                 pygame.mixer.stop()
                 print 'Clear sounds'
@@ -92,7 +104,6 @@ while True:
     # pretty print
     now = time.time()
     if last_refresh is None or now - last_refresh > REFRESH_TIME:
-        print 'redraw'        
         screen.fill((0,0,0))  # clear screen
         last_refresh = now
         pygame.display.update()
@@ -110,7 +121,11 @@ while True:
             # y position proportional to time elapsed
             dt = now-m_event['time']
             y = int(dt * SCREEN_HEIGHT / float(FLIGHT_TIME))
+            # color
+            color_indicator = sounds_idx[name] / float(len(sounds_idx))
+            dt_indicator = np.clip((1-dt/FLIGHT_TIME)**2., 0, 1)
+            color = float_to_rgb(sounds_idx[name] / float(len(sounds_idx)), dt_indicator)
             # draw rectangle
-            pygame.draw.rect(screen, (255, 0, 255), (x, y, BLOCK_WIDTH, BLOCK_HEIGHT), 0)
+            pygame.draw.rect(screen, color, (x, y, BLOCK_WIDTH, BLOCK_HEIGHT), 0)
         # update
         pygame.display.update()
